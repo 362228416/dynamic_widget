@@ -234,8 +234,9 @@ class NonResponseWidgetClickListener implements ClickListener {
 
 class DynamicWidget extends StatefulWidget {
   final String jsCode;
+  final ClickListener? listener;
 
-  const DynamicWidget(this.jsCode);
+  const DynamicWidget(this.jsCode, {this.listener});
 
   @override
   DynamicWidgetState createState() => DynamicWidgetState();
@@ -278,7 +279,7 @@ class DynamicWidgetState extends State<DynamicWidget> {
     return DynamicWidgetBuilder.build(
       jsonCode,
       context,
-      DefaultClickListener(onClick: _onClick),
+      widget.listener??DefaultClickListener(onClick: _onClick),
     );
   }
 
