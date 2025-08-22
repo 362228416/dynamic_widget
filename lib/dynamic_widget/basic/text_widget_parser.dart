@@ -53,7 +53,8 @@ class TextWidgetParser implements WidgetParser {
 
   @override
   Map<String, dynamic> export(Widget? widget, BuildContext? buildContext) {
-    var realWidget = widget as Text;
+    final realWidget = widget as Text;
+    final double scale = realWidget.textScaler?.scale(1.0) ?? 1.0;
     if (realWidget.textSpan == null) {
       return <String, dynamic>{
         "type": "Text",
@@ -67,7 +68,7 @@ class TextWidgetParser implements WidgetParser {
         "softWrap": realWidget.softWrap,
         "textDirection": exportTextDirection(realWidget.textDirection),
         "style": exportTextStyle(realWidget.style),
-        "textScaler": realWidget.textScaler ?? TextScaler.linear(1.0),
+        "textScaleFactor": scale,
       };
     } else {
       var parser = TextSpanParser();
@@ -83,7 +84,7 @@ class TextWidgetParser implements WidgetParser {
         "softWrap": realWidget.softWrap,
         "textDirection": exportTextDirection(realWidget.textDirection),
         "style": exportTextStyle(realWidget.style),
-        "textScaler": realWidget.textScaler ?? TextScaler.linear(1.0),
+        "textScaleFactor": scale,
       };
     }
   }
