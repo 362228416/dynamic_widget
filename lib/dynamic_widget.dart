@@ -1,6 +1,7 @@
 library dynamic_widget;
 
 import 'dart:convert';
+import 'dart:ui' as ui;
 
 import 'package:dynamic_widget/dynamic_widget/basic/align_widget_parser.dart';
 import 'package:dynamic_widget/dynamic_widget/basic/appbar_widget_parser.dart';
@@ -250,7 +251,15 @@ class DynamicWidgetState extends State<DynamicWidget> {
     super.initState();
     _js = JsRuntime();
     jsCode = widget.jsCode;
-    jsonCode = _js.eval("var App;$jsCode;JSON.stringify(App)");
+    // jsonCode = _js.eval("var App;$jsCode;JSON.stringify(App)");
+    // double px(double x) {
+    //   var w = MediaQueryData.fromView(ui.window).size.width;
+    //   double unit = w / 750.0; // Assuming 750 is the base width for scaling
+    //   return x * unit;
+    // }
+    var w = MediaQueryData.fromView(ui.window).size.width;
+
+    jsonCode = _js.eval("var App;function px(x){return x*$w/750};$jsCode;JSON.stringify(App)");
   }
 
   @override
