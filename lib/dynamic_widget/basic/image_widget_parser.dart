@@ -1,6 +1,6 @@
 import 'package:dynamic_widget/dynamic_widget.dart';
 import 'package:dynamic_widget/dynamic_widget/utils.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 class AssetImageWidgetParser extends WidgetParser {
   @override
@@ -238,6 +238,41 @@ class NetworkImageWidgetParser extends WidgetParser {
       matchTextDirection: matchTextDirection,
       gaplessPlayback: gaplessPlayback,
       filterQuality: filterQuality,
+      errorBuilder: (context, error, stackTrace) {
+        // 图片加载失败时显示占位符
+        return Container(
+          width: width,
+          height: height,
+          color: Colors.grey[200],
+          child: Center(
+            child: Icon(
+              Icons.broken_image,
+              size: (width != null && height != null)
+                ? (width < height ? width * 0.3 : height * 0.3)
+                : 40,
+              color: Colors.grey[400],
+            ),
+          ),
+        );
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        // 图片加载中显示进度指示器
+        return Container(
+          width: width,
+          height: height,
+          color: Colors.grey[100],
+          child: Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                  : null,
+              strokeWidth: 2.0,
+            ),
+          ),
+        );
+      },
     );
 
     if (listener != null && (clickEvent != null && clickEvent.isNotEmpty)) {
