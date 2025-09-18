@@ -1169,10 +1169,24 @@ Map<String, dynamic>? exportBorderSide(BorderSide borderSide) {
 BorderSide parseBorderSide(Map<String, dynamic>? map) {
   if (map == null) return BorderSide.none;
   if (!map.containsKey('color')) return BorderSide.none;
+  
+  // 安全解析颜色
+  Color? color = parseHexColor(map['color']);
+  if (color == null) return BorderSide.none;
+  
+  // 安全解析 style
+  BorderStyle style = BorderStyle.solid;
+  if (map['style'] != null && map['style'] is int) {
+    int styleIndex = map['style'];
+    if (styleIndex >= 0 && styleIndex < BorderStyle.values.length) {
+      style = BorderStyle.values[styleIndex];
+    }
+  }
+  
   return BorderSide(
-    color: parseHexColor(map['color'])!,
-    width: map['width'] ?? 0,
-    style: BorderStyle.values[map['style']],
+    color: color,
+    width: (map['width'] ?? 1.0).toDouble(),
+    style: style,
   );
 }
 
@@ -1207,4 +1221,50 @@ Radius parseRadius(String radius) {
   } else {
     return Radius.zero;
   }
+}
+
+/// Border
+Map<String, dynamic>? exportBorder(Border? border) {
+  if (border == null) return null;
+  return <String, dynamic>{
+    "top": exportBorderSide(border.top),
+    "right": exportBorderSide(border.right),
+    "bottom": exportBorderSide(border.bottom),
+    "left": exportBorderSide(border.left),
+  };
+}
+
+Border? parseBorder(Map<String, dynamic>? map) {
+  if (map == null) return null;
+  return Border(
+    top: parseBorderSide(map['top']),
+    right: parseBorderSide(map['right']),
+    bottom: parseBorderSide(map['bottom']),
+    left: parseBorderSide(map['left']),
+  );
+}
+
+/// BoxDecoration
+Map<String, dynamic>? exportBoxDecoration(BoxDecoration? decoration) {
+  if (decoration == null) return null;
+  return <String, dynamic>{
+    "color": decoration.color != null
+        ? decoration.color!.toARGB32().toRadixString(16)
+        : null,
+    "border": decoration.border is Border ? exportBorder(decoration.border as Border) : null,
+    "borderRadius": decoration.borderRadius != null
+        ? exportBorderRadius(decoration.borderRadius as BorderRadius)
+        : null,
+  };
+}
+
+BoxDecoration? parseBoxDecoration(Map<String, dynamic>? map) {
+  if (map == null) return null;
+  return BoxDecoration(
+    color: parseHexColor(map['color']),
+    border: parseBorder(map['border']),
+    borderRadius: map['borderRadius'] != null
+        ? parseBorderRadius(map['borderRadius'])
+        : null,
+  );
 }
